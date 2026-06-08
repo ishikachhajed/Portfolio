@@ -14,8 +14,8 @@ export const ContactForm: React.FC<{
   const [success, setSuccess] = useState<boolean | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // pick recipient from prop or from Vite env (if available)
-  const DEFAULT_TO = sendTo ?? import.meta.env.VITE_CONTACT_EMAIL ?? "";
+  // pick recipient from prop or from Vite env (if available), fallback to direct email
+  const DEFAULT_TO = sendTo || import.meta.env.VITE_CONTACT_EMAIL || "ishikachhajed24@gmail.com";
 
   function update(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -30,34 +30,23 @@ export const ContactForm: React.FC<{
     setSuccess(null);
     setErrorMsg(null);
 
-    const endpoint = import.meta.env.VITE_MAIL_API_URL + "/send";
-
-    // require a recipient address somewhere (either env or passed prop)
-    if (!DEFAULT_TO) {
-      console.warn(
-        "ContactForm: no recipient configured. Set VITE_CONTACT_EMAIL or pass sendTo prop.",
-      );
-      setErrorMsg(
-        "Recipient address not configured. Contact admin to enable messaging.",
-      );
-      setSuccess(false);
-      setLoading(false);
-      return;
-    }
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || "service_1tt7yyc";
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "template_e2ut1bm";
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "Jq2D5c7aZX-pTHmoJ";
 
     const payload = {
-      to: DEFAULT_TO,
-      subject: `Website contact from ${state.name || state.email}`,
-      body: `${state.message}\n\n---\nFrom: ${state.name || "Anonymous"} <${
-        state.email
-      }>`,
-      html: false,
-      from_name: state.name || undefined,
-      from_email: state.email || undefined,
+      service_id: serviceId,
+      template_id: templateId,
+      user_id: publicKey,
+      template_params: {
+        from_name: state.name || "Anonymous Visitor",
+        from_email: state.email || "No email provided",
+        message: state.message,
+      },
     };
 
     try {
-      const res = await fetch(endpoint, {
+      const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -65,16 +54,16 @@ export const ContactForm: React.FC<{
 
       if (!res.ok) {
         const text = await res.text().catch(() => null);
-        throw new Error(text || `Server returned ${res.status}`);
+        throw new Error(text || `EmailJS returned ${res.status}`);
       }
 
       // success
       setSuccess(true);
       setState({ name: "", email: "", message: "" });
     } catch (err) {
-      console.error("Failed to send contact message", err);
+      console.error("Failed to send message via EmailJS", err);
       setSuccess(false);
-      setErrorMsg((err as Error).message || "Failed to send message");
+      setErrorMsg("Failed to send message. Please try again later.");
     } finally {
       setLoading(false);
     }
