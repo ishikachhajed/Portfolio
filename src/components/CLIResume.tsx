@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import type { Portfolio } from "../types/portfolio";
 import { PORTFOLIO_INFO } from "../config/portfolioData";
 
-const API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
 type Props = { open?: boolean; onClose?: () => void };
 
@@ -459,16 +458,7 @@ export default function CLIResume({ open = false, onClose }: Props) {
     });
   }
 
-  async function queryRagApi(q: string) {
-    const url = `${API_URL}/api/query`;
-    const resp = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ q }),
-    });
-    const json = await resp.json();
-    return json;
-  }
+
 
   if (!visible) return null;
 

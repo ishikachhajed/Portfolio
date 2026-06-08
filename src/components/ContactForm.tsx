@@ -2,9 +2,7 @@ import React, { useState } from "react";
 
 type ContactState = { name: string; email: string; message: string };
 
-export const ContactForm: React.FC<{
-  sendTo?: string; // recipient email address (optional; fallback to VITE_CONTACT_EMAIL)
-}> = ({ sendTo }) => {
+export const ContactForm: React.FC = () => {
   const [state, setState] = useState<ContactState>({
     name: "",
     email: "",
@@ -13,9 +11,6 @@ export const ContactForm: React.FC<{
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  // pick recipient from prop or from Vite env (if available), fallback to direct email
-  const DEFAULT_TO = sendTo || import.meta.env.VITE_CONTACT_EMAIL || "ishikachhajed24@gmail.com";
 
   function update(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
