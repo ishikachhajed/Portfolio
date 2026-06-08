@@ -25,9 +25,9 @@ export const ContactForm: React.FC = () => {
     setSuccess(null);
     setErrorMsg(null);
 
-    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || "service_1tt7yyc";
-    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "template_e2ut1bm";
-    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "Jq2D5c7aZX-pTHmoJ";
+    const serviceId = "service_1tt7yyc";
+    const templateId = "template_e2ut1bm";
+    const publicKey = "Jq2D5c7aZX-pTHmoJ";
 
     const payload = {
       service_id: serviceId,
@@ -58,7 +58,7 @@ export const ContactForm: React.FC = () => {
     } catch (err) {
       console.error("Failed to send message via EmailJS", err);
       setSuccess(false);
-      setErrorMsg("Failed to send message. Please try again later.");
+      setErrorMsg((err as Error).message || "Failed to send message. Please try again later.");
     } finally {
       setLoading(false);
     }
